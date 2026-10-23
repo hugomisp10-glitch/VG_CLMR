@@ -1,0 +1,357 @@
+<!doctype html><html lang="pt-PT"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Mapa 3D · Alsácia de Natal</title>
+<meta name="description" content="Mapa 3D da Alsácia no Natal: ruas, monumentos, mercados e trajetos.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎄%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<style>
+*{box-sizing:border-box}html,body{height:100%;margin:0}body{font:15px system-ui,sans-serif;color:#1d2b25;display:flex;flex-direction:column;overflow:hidden}
+header{position:relative;z-index:5;background:linear-gradient(155deg,#10342a,#1f4d3d 55%,#2d614b);color:#fff;padding:10px 12px 12px;box-shadow:0 4px 14px #0004}
+header::after{content:"";position:absolute;left:0;right:0;bottom:-8px;height:8px;pointer-events:none;background:radial-gradient(circle,#ff6b6b 3px,#0000 4px) 0 2px/48px 8px repeat-x,radial-gradient(circle,#ffd36a 3px,#0000 4px) 12px 2px/48px 8px repeat-x,radial-gradient(circle,#7fe0a8 3px,#0000 4px) 24px 2px/48px 8px repeat-x,radial-gradient(circle,#8cc4f7 3px,#0000 4px) 36px 2px/48px 8px repeat-x;animation:tw 2.4s ease-in-out infinite alternate}
+@keyframes tw{from{opacity:.6}to{opacity:1}}
+h1{font:700 21px Georgia,serif;margin:0 0 8px}h1::before{content:"✦ ";color:#e0a82e;font-size:.65em}
+.row{display:flex;gap:6px;overflow-x:auto;padding:2px 0;scrollbar-width:none}.row::-webkit-scrollbar{display:none}
+.ch{flex:none;border:1px solid #fff4;background:#ffffff18;color:#fff;border-radius:999px;padding:6px 13px;font:inherit;font-size:13px}.ch.on{background:#fff;color:#1f4d3d}
+#q{width:100%;margin-bottom:7px;border:0;border-radius:12px;padding:10px 13px;font:inherit}
+#res{position:absolute;left:12px;right:12px;top:84px;background:#fff;color:#1d2b25;border-radius:12px;box-shadow:0 8px 30px #0005;max-height:50vh;overflow:auto;display:none;z-index:9}
+#res div{padding:10px 14px;border-bottom:1px solid #eee}#res small{color:#777}
+#wrap{flex:1;position:relative;min-height:0}#map{position:absolute;inset:0}
+#snow{position:absolute;inset:0;pointer-events:none;z-index:2;opacity:.55;background-image:radial-gradient(2px 2px at 20px 30px,#fff,#0000),radial-gradient(2px 2px at 90px 120px,#fff,#0000),radial-gradient(3px 3px at 150px 60px,#fff,#0000),radial-gradient(2px 2px at 60px 170px,#fff,#0000);background-size:200px 200px;animation:sn 16s linear infinite}
+@keyframes sn{to{background-position:-40px 200px}}
+.tools{position:absolute;right:10px;top:10px;z-index:4;display:flex;flex-direction:column;gap:8px}
+.tools button{width:44px;height:44px;border:0;border-radius:14px;background:#fffe;box-shadow:0 3px 12px #0004;font-size:18px;backdrop-filter:blur(8px)}.tools button.on{background:#1f4d3d;color:#fff}
+.bar{position:absolute;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:4}
+.bar button{border:0;border-radius:999px;padding:12px 22px;font:600 15px system-ui;background:linear-gradient(135deg,#b3202a,#d2453d);color:#fff;box-shadow:0 6px 18px #0006}
+.mk{display:flex;flex-direction:column;align-items:center;cursor:pointer}.mk i{font-style:normal;width:36px;height:36px;border-radius:50%;border:3px solid #fff;display:grid;place-items:center;font-size:19px;box-shadow:0 3px 8px #0006;transition:transform .15s}
+.mk:hover i{transform:scale(1.18) translateY(-3px)}.mk::after{content:"";width:0;height:0;border:6px solid #0000;border-top-color:#fff;margin-top:-2px;order:1}
+.mk b{order:2;display:none;font-size:11px;font-weight:700;background:#fffe;border-radius:8px;padding:1px 6px;margin-top:1px;white-space:nowrap;box-shadow:0 1px 4px #0003}.mk.lb b{display:block}.mk.h{display:none}
+.santa{font-size:34px;filter:drop-shadow(0 3px 3px #0006);pointer-events:none}
+#sh{position:absolute;left:8px;right:8px;bottom:8px;z-index:6;max-height:56%;overflow:auto;background:#fff;border-radius:24px 24px 18px 18px;box-shadow:0 12px 44px #0007;padding:8px 16px 16px;transform:translateY(120%);transition:transform .25s}#sh.o{transform:none}
+#sh::before{content:"";display:block;width:40px;height:4px;border-radius:2px;background:#ddd;margin:0 auto 10px}
+#sh h2{font:700 21px Georgia,serif;margin:0 28px 6px 0}#sh p{line-height:1.5;margin:.4em 0}.tag{display:inline-block;background:#e8f1ec;color:#1f4d3d;border-radius:12px;padding:2px 10px;font-size:12px;font-weight:600;margin-right:4px}
+#sh a,#sh button.b{display:inline-block;margin:4px 6px 0 0;border:0;border-radius:12px;padding:10px 14px;font:600 14px system-ui;text-decoration:none;background:linear-gradient(135deg,#1f4d3d,#2f6b4a);color:#fff}#sh a.o{background:#fff;color:#1d2b25;border:1px solid #ccc}
+#x{position:absolute;right:12px;top:10px;border:0;background:#0001;border-radius:50%;width:30px;height:30px}
+.tj{border-left:4px solid #b3202a;background:#f7f4ee;border-radius:12px;padding:10px 12px;margin:8px 0;cursor:pointer}.tj small{color:#777}
+#toast{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:8;background:#b3202a;color:#fff;border-radius:12px;padding:8px 14px;display:none}
+.maplibregl-ctrl-bottom-left{bottom:62px}
+@media(prefers-reduced-motion:reduce){#snow,header::after{animation:none}}
+</style><style>#il{position:fixed;inset:0;z-index:30;background:#a9cf86;display:none;touch-action:none}#il.o{display:block}#is{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab}
+#is .d2{opacity:0;transition:opacity .3s}#is.z2 .d2{opacity:1}
+.nm{font:800 27px "Trebuchet MS",system-ui,sans-serif;fill:#5b3b5e;paint-order:stroke;stroke:#eaf5d6;stroke-width:7px;stroke-linejoin:round;letter-spacing:.5px}.sb{font:600 18px "Trebuchet MS",system-ui,sans-serif;fill:#6b4a6e;paint-order:stroke;stroke:#eaf5d6;stroke-width:5px;stroke-linejoin:round}
+#ih{position:absolute;left:0;right:0;top:0;padding:10px 12px;text-align:center;pointer-events:none;background:linear-gradient(#b7d896f2,#b7d89600)}#ih h2{margin:0;font:800 clamp(30px,8vw,46px) "Trebuchet MS","Segoe UI",sans-serif;color:#fff;text-shadow:0 3px 0 #5d8a52,0 0 14px #3d6a42,2px 2px 0 #3d6a42;letter-spacing:1px}
+#ih small{display:inline-block;color:#fff;background:#3d5a3dcc;border-radius:12px;padding:2px 12px;margin:2px 0 6px;font-weight:600}#itb{pointer-events:auto;justify-content:center;flex-wrap:wrap}
+#itb button{border:0;background:#ffffffcc;color:#3d5a3d;border-radius:999px;padding:6px 14px;font:600 13px system-ui}#itb button.on{background:#5b3b5e;color:#fff}
+#ic{position:absolute;right:10px;bottom:calc(14px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:8px}#ic button{border:0;border-radius:14px;min-width:44px;height:44px;padding:0 12px;background:#fffe;box-shadow:0 3px 12px #0004;font:600 17px system-ui;color:#3d5a3d}
+.bar{display:flex;gap:8px}.bar #bi{background:linear-gradient(135deg,#5b3b5e,#8a5a8e)}
+
+#il::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;opacity:.7;background-image:radial-gradient(2px 2px at 20px 30px,#fff,#0000),radial-gradient(3px 3px at 130px 80px,#fff,#0000),radial-gradient(2px 2px at 70px 160px,#fff,#0000);background-size:180px 200px;animation:isn 14s linear infinite}@keyframes isn{to{background-position:-30px 200px}}
+#ih,#ic,#ik,#iy{z-index:3}#ih h2{background:linear-gradient(#cf2e3a,#8e1c28);color:#fff6d8;display:inline-block;padding:2px 26px;border-radius:14px;border:3px solid #ffd36a;text-shadow:0 2px 0 #5a0f18;box-shadow:0 6px 16px #0005}
+#ih small{margin:6px 3px}#ipg{background:#1f6a45cc}
+.tw{animation:tww 1.6s ease-in-out infinite alternate}@keyframes tww{from{opacity:.45}to{opacity:1}}
+.p{cursor:pointer}.p .bc{fill:#fff}.p .bt{font:800 24px system-ui;fill:#b3202a}.p.v .bc{fill:#2fbf71}.p.v .bt{fill:#fff}.p.v use{filter:drop-shadow(0 0 8px #2fbf71)}
+#ik{position:absolute;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));max-width:520px;margin:auto;background:#fffaf0;border:3px solid #b3202a;border-radius:22px;padding:14px 16px;box-shadow:0 10px 40px #0007;transform:translateY(140%);transition:transform .25s}#ik.o{transform:none}
+#ik h3,#yc h3{margin:0 30px 6px 0;font:800 22px "Trebuchet MS",sans-serif;color:#8e1c28}#ik p{margin:.3em 0;color:#4a3a30}#kx,#yx{position:absolute;right:10px;top:8px;border:0;background:#0001;border-radius:50%;width:30px;height:30px}
+.vbtn{display:block;width:100%;margin:8px 0;padding:12px;border:0;border-radius:14px;font:700 16px system-ui;background:#e9e2d0;color:#4a3a30}.vbtn.v{background:#2fbf71;color:#fff}#kn{width:100%;border:1px solid #d6c9a8;border-radius:12px;padding:10px;font:inherit}
+#iy{position:absolute;left:0;top:0;bottom:0;width:min(86vw,340px);background:#fffaf0;padding:16px;overflow:auto;transform:translateX(-105%);transition:transform .25s;box-shadow:6px 0 30px #0006}#iy.o{transform:none}#yc h4{margin:14px 0 4px;color:#1f6a45}#yc label{display:block;padding:7px 0;color:#3a2f28}#yc input{width:20px;height:20px;vertical-align:middle;margin-right:8px}
+.mk i{position:relative}.mk.vis i{box-shadow:0 0 0 4px #2fbf71,0 3px 8px #0006}.mk.vis i::before{content:"✔";position:absolute;right:-7px;top:-7px;background:#2fbf71;color:#fff;border-radius:50%;width:18px;height:18px;font:700 11px system-ui;display:grid;place-items:center;z-index:2}
+
+#il{height:100dvh}#ih{padding-top:max(10px,env(safe-area-inset-top))}#itb{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;padding:2px 4px 6px;scrollbar-width:none}#itb button{flex:none;min-height:40px}
+#ic{right:max(10px,env(safe-area-inset-right))}#ic button{min-width:48px;height:48px}#kn{font-size:16px}
+@media(min-width:768px){#itb{justify-content:center;flex-wrap:wrap}#ik{left:auto;right:20px;bottom:20px;width:460px;margin:0}#ic button{min-width:58px;height:58px;font-size:21px}#ih h2{font-size:54px}#itb button{font-size:15px;padding:8px 18px}#iy{width:380px}}
+@media(max-height:480px) and (orientation:landscape){#ih h2{font-size:26px}#ih small{display:none}#ik{left:auto;right:70px;width:360px}}
+html,body{height:100dvh}body{overscroll-behavior:none;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}header{padding-top:max(10px,env(safe-area-inset-top))}#q{font-size:16px}#res{top:calc(max(10px,env(safe-area-inset-top)) + 92px)}
+.ch,.tools button,.bar button{min-height:44px}.bar{bottom:calc(14px + env(safe-area-inset-bottom))}
+@media(max-width:480px){h1{font-size:19px}.mk i{width:32px;height:32px;font-size:17px}.bar button{padding:12px 16px;font-size:14px}}
+@media(min-width:768px){h1{font-size:26px}#q{max-width:440px}#sh{left:auto;right:16px;bottom:16px;width:460px;max-height:72%}.tools{top:16px;right:16px}.tools button{width:54px;height:54px;font-size:21px}.bar button{font-size:17px;padding:14px 26px}.mk i{width:44px;height:44px;font-size:23px}.mk b{font-size:13px}.mk.lb b{padding:2px 8px}}
+@media(max-height:480px) and (orientation:landscape){h1{display:none}header{padding:6px 10px}#q{margin-bottom:5px}#sh{left:auto;width:400px;right:8px;max-height:80%}}
+</style><style>.maplibregl-map{position:relative;overflow:hidden}.maplibregl-canvas{position:absolute;left:0;top:0}.maplibregl-marker{position:absolute!important;top:0!important;left:0!important;will-change:transform}.maplibregl-marker.mk{pointer-events:auto}</style><meta http-equiv="Cache-Control" content="no-cache"><style>body.emb h1{display:none}body.emb header{padding-top:8px}</style><style>.nm{font-size:13px;stroke-width:4px}.p .bt{font:800 12px system-ui}.sb{display:none}#yc span{cursor:pointer;text-decoration:underline dotted}</style></head><body>
+<header><h1>Alsácia de Natal</h1><input id="q" placeholder="🔎 Pesquisar monumento, aldeia, mercado…" autocomplete="off"><div class="row" id="ch"></div></header>
+<div id="res"></div>
+<div id="wrap"><div id="map"></div><div id="snow"></div><div id="toast"></div>
+<div class="tools"><button id="b3" class="on" title="Inclinar 3D">🧊</button><button id="bo" title="Rodar">↻</button><button id="bs" title="Estilo do mapa">🗺</button></div>
+<div class="bar"><button id="bt">🧭 Trajetos</button><button id="bi">🎨 Ilustrações</button></div>
+<div id="sh"><button id="x" aria-label="Fechar">✕</button><div id="shc"></div></div></div>
+<script src="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script>
+const MKT='Mercados de Natal: em geral de finais de novembro a 24–31 dez. Confirma as datas de 2026 nos sites oficiais.';
+// tipo → [cor, ícone, nome na legenda, prioridade do rótulo, tamanho]
+const K={air:['#1767b5','plane','Aeroporto',0,1.15],city:['#b3202a','cath','Cidade',0,1.1],vil:['#d9822b','house','Aldeia',1,1],cast:['#6a4c93','castle','Castelo / monumento',2,.9],cath:['#b3202a','cath','Catedral / igreja',2,.9],canal:['#12808a','boat','Canais',2,.9],mkt:['#1f5a45','tree','Mercado de Natal',2,.9],st:['#37474f','train','Estação de comboio',3,.85],tram:['#7b3fb3','tram','Paragem de elétrico',3,.8]};
+// id,nome,tipo,lat,lon,lado,zoomMin,mercado,descrição,como chegar
+const D=[
+['bsl','EuroAirport Basel-Mulhouse-Freiburg','air',47.5896,7.5299,'l',1,0,'O aeroporto fica em território francês. Sai pelo lado França para usar os transportes alsacianos.','Autocarro 50 → Basel SBB (~20 min). Autocarro 11 → Saint-Louis (gare) (~15 min) e depois comboio TER.'],
+['baz','Basileia (Basel)','city',47.5560,7.5880,'r',1,1,'Cidade suíça junto à fronteira. Mercados de Natal em Münsterplatz e Barfüsserplatz.','Autocarro 50 desde o aeroporto até Basel SBB e elétrico para o centro.'],
+['bas','Basel SBB','st',47.5476,7.5896,'r',3,0,'Grande estação suíça, com TER para Mulhouse, Colmar e Estrasburgo.','Em francos suíços (CHF) para viagens na Suíça; para a França compra bilhete TER.'],
+['stl','Saint-Louis (gare)','st',47.5886,7.5575,'r',1.4,0,'Estação francesa mais próxima do aeroporto.','Comboio TER para Mulhouse (~15 min) e Colmar.'],
+['mul','Mulhouse','city',47.7418,7.3425,'r',1,1,'Cidade de museus. Mercado de Natal na Place de la Réunion, elétrico no centro.','Comboio TER desde Basel/Saint-Louis (~20 min).'],
+['cgare','Colmar (gare)','st',48.0713,7.3467,'l',6,0,'Estação de Colmar, a ~15 min a pé do centro.','TER Mulhouse (~25 min), Estrasburgo (~30 min). Autocarros Trace e Fluo.'],
+['col','Colmar','city',48.0794,7.3585,'r',1,1,'Cidade-base ideal: mercados no centro, casas de madeira, canais e museus.','A pé no centro. Dali saem os autocarros para as aldeias do vinho.'],
+['koi','Koïfhus (Ancienne Douane)','mkt',48.0785,7.3581,'r',7,1,'Edifício medieval com mercado de Natal na praça.','A pé do centro.'],
+['sm','Colleg. Saint-Martin','cath',48.0793,7.3579,'l',9,0,'Igreja gótica no coração da cidade velha.','A pé.'],
+['mdt','Maison des Têtes','cast',48.0790,7.3565,'l',9,0,'Casa renascentista coberta de cabeças esculpidas.','A pé.'],
+['dom','Place des Dominicains','mkt',48.0788,7.3548,'l',7,1,'Mercado de Natal junto à igreja dos Dominicanos.','A pé.'],
+['unt','Musée Unterlinden','cast',48.0803,7.3511,'l',8,0,'Museu com o Retábulo de Issenheim, em antigo convento.','A pé do centro (~10 min).'],
+['pv','Petite Venise','canal',48.0745,7.3555,'r',6,1,'Canais, casas coloridas e barcos. Mercado de Natal junto à água.','A pé do centro (~10 min).'],
+['egu','Eguisheim','vil',48.0434,7.3066,'l',1,1,'Aldeia circular com ruas concêntricas e mercado acolhedor.','Autocarro Trace desde Colmar (linha 6, confirmar).'],
+['tur','Turckheim','vil',48.0889,7.2760,'l',1,1,'Aldeia fortificada. Mercado de Natal e ronda do guarda-noturno.','Comboio TER Colmar → Turckheim (~10 min).'],
+['kay','Kaysersberg','vil',48.1386,7.2644,'l',1,1,'Terra de Albert Schweitzer, com castelo e ponte fortificada.','Autocarro Fluo desde Colmar (~30 min, confirmar linha).'],
+['rqw','Riquewihr','vil',48.1667,7.2970,'r',1,1,'Uma das aldeias mais bonitas de França. Mercado de Natal medieval.','Autocarro Fluo desde Colmar (linha 106, confirmar).'],
+['rib','Ribeauvillé','vil',48.1950,7.3190,'r',1,1,'Três castelos sobre a vila. Mercado de Natal na Grand\'Rue.','Autocarro Fluo desde Colmar ou Sélestat (confirmar).'],
+['hk','Château du Haut-Kœnigsbourg','cast',48.2494,7.3444,'r',1,0,'Castelo medieval reconstruído, muito visível do vale.','De Sélestat: navette sazonal (confirmar) ou táxi (~20 min).'],
+['sel','Sélestat','city',48.2603,7.4509,'r',1,1,'Cidade humanista e berço histórico da tradição da árvore de Natal.','TER Colmar (~15 min) e Estrasburgo (~25 min).'],
+['obe','Obernai','vil',48.4616,7.4812,'r',1,1,'Centro medieval, poço de Seis Baldes e mercado de Natal bonito.','TER Estrasburgo → Obernai (~25 min).'],
+['str','Estrasburgo','city',48.5839,7.7455,'r',1,1,'"Capitale de Noël": o maior mercado da região, espalhado pela cidade velha.','TER desde Basel/Colmar. Na cidade, elétrico (não há metro).'],
+['sgare','Estrasburgo (gare)','st',48.5850,7.7352,'l',6,0,'Estação central, junto à linha A/D do elétrico.','Elétrico A/D → Homme de Fer (~5 min).'],
+['hdf','Homme de Fer','tram',48.5843,7.7485,'r',8,0,'Principal nó de elétricos do centro.','A pé até à Catedral (~5 min).'],
+['kle','Place Kléber','mkt',48.5838,7.7455,'l',8,1,'Praça com o grande abeto de Natal.','Elétrico A/D até Homme de Fer, depois a pé.'],
+['bro','Place Broglie','mkt',48.5855,7.7503,'r',9,1,'Mercado de Natal com artesanato e comida.','A pé.'],
+['cat','Catedral de Estrasburgo','cath',48.5819,7.7511,'r',4,1,'Catedral gótica em arenito rosa, e Christkindelsmärik na praça.','A pé desde Homme de Fer.'],
+['pet','Petite France','canal',48.5802,7.7387,'l',6,1,'Casas enxaimel, canais, Pontes Cobertas e mercado de Natal.','A pé do centro (~15 min).']
+];
+
+const L=[ // modo, nome, paragens, info
+['train','TER Basel – Mulhouse – Colmar – Sélestat – Estrasburgo',['bas','stl','mul','cgare','sel','sgare'],'Linha principal. Basel → Colmar ~50–60 min, Basel → Estrasburgo ~1h15–1h30. Bilhetes na SNCF Connect ou nas máquinas das estações.'],
+['train','TER Colmar – Turckheim',['cgare','tur'],'~10 min, vale de Munster.'],
+['train','TER Estrasburgo – Obernai',['sgare','obe'],'~25 min.'],
+['bus','Autocarro 50: aeroporto – Basel SBB',['bsl','bas'],'~20 min, frequente.'],
+['bus','Autocarro 11: aeroporto – Saint-Louis',['bsl','stl'],'~15 min, liga ao comboio francês.'],
+['bus','Autocarro Colmar – Eguisheim',['col','egu'],'Rede Trace (confirmar linha e horários).'],
+['bus','Autocarro Colmar – Kaysersberg',['col','kay'],'Rede Fluo Grand Est (confirmar).'],
+['bus','Autocarro Colmar – Riquewihr – Ribeauvillé – Sélestat',['col','rqw','rib','sel'],'Rede Fluo Grand Est (linha 106, confirmar).'],
+['bus','Sélestat – Haut-Kœnigsbourg',['sel','hk'],'Navette sazonal (confirmar) ou táxi.'],
+['tram','Elétrico A/D: Gare – Homme de Fer',['sgare','hdf'],'Estrasburgo tem elétrico, não metro. ~5 min.']
+];
+const TJ=[ // título, duração, texto, linhas
+['Aeroporto → Colmar','~1h15–1h30','Autocarro 11 até Saint-Louis (gare), depois TER via Mulhouse até Colmar.',[4,0],'col'],
+['Aeroporto → Estrasburgo','~1h45–2h','Autocarro 50 até Basel SBB (ou 11 até Saint-Louis) e TER direto para Estrasburgo.',[3,4,0],'str'],
+['Colmar → Riquewihr, Ribeauvillé, Kaysersberg','~30–40 min','Autocarros Fluo a partir de Colmar. Confirma linhas e últimos horários.',[7,6],'rqw'],
+['Colmar → Eguisheim e Turckheim','10–20 min','Eguisheim de autocarro, Turckheim de comboio.',[5,1],'egu'],
+['Estrasburgo → Obernai','~25 min','TER direto. Boa aldeia para uma tarde.',[2],'obe'],
+['Sélestat → Haut-Kœnigsbourg','~20 min','Navette sazonal ou táxi.',[8],'hk'],
+['Dentro de Estrasburgo','5–15 min','Elétrico A/D até Homme de Fer e depois a pé: Kléber, Catedral, Petite France.',[9],'str']
+];
+const C={v:['🏛','#6a4c93','Visitas'],m:['🎄','#1f5a45','Mercados'],c:['🥨','#d9822b','Comer'],t:['🚉','#37474f','Transportes']};
+const ell=(c,a,b,n=28)=>Array.from({length:n+1},(_,i)=>[c[0]+a*Math.sin(i*6.2832/n),c[1]+b*Math.cos(i*6.2832/n)]);
+// ruas: [nome, principal(1/0), pontos]   POIs: [nome, cat, lat, lon, texto]
+const T=[
+{id:'col',n:'Colmar',c:[48.0788,7.3560],
+ S:[['Av. de la République',1,[[48.0713,7.3467],[48.0745,7.3500],[48.0775,7.3535],[48.0786,7.3560]]],
+  ['Rue des Clefs',1,[[48.0803,7.3511],[48.0788,7.3548],[48.0785,7.3581]]],
+  ['Rue des Marchands',0,[[48.0798,7.3562],[48.0790,7.3568],[48.0783,7.3573]]],
+  ['Grand\'Rue',0,[[48.0772,7.3552],[48.0779,7.3570],[48.0783,7.3587]]],
+  ['Quai de la Poissonnerie',0,[[48.0746,7.3538],[48.0749,7.3560],[48.0746,7.3580]]]],
+ Q:[['Maison Pfister','v',48.0794,7.3563,'Casa de 1537 com varandas de madeira e frescos. Exterior visível a qualquer hora.'],
+  ['Musée Bartholdi','v',48.0798,7.3572,'Casa natal do escultor da Estátua da Liberdade. Bilhete pago; confirma horário.'],
+  ['Marché couvert','c',48.0757,7.3548,'Mercado coberto junto ao canal: queijos, charcutaria e comida rápida. Fecha cedo e ao domingo (confirmar).'],
+  ['Pont da Poissonnerie','v',48.0746,7.3556,'Melhor ponto de vista sobre os canais de Petite Venise, bom ao fim da tarde.']]},
+{id:'str',n:'Estrasburgo',c:[48.5832,7.7470],
+ S:[['Rue du 22 Novembre',1,[[48.5849,7.7355],[48.5845,7.7400],[48.5841,7.7440],[48.5841,7.7465]]],
+  ['Grand\'Rue',1,[[48.5842,7.7410],[48.5840,7.7440],[48.5838,7.7456]]],
+  ['Rue des Grandes Arcades',1,[[48.5837,7.7480],[48.5841,7.7463],[48.5838,7.7455]]],
+  ['Rue Mercière',0,[[48.5822,7.7505],[48.5829,7.7490],[48.5836,7.7480]]],
+  ['Rue du Bain-aux-Plantes',0,[[48.5800,7.7378],[48.5805,7.7395],[48.5810,7.7415],[48.5815,7.7445]]]],
+ Q:[['Maison Kammerzell','c',48.5820,7.7507,'Casa de 1427 junto à catedral, restaurante tradicional alsaciano. Reserva em época de Natal.'],
+  ['Palais Rohan','v',48.5807,7.7517,'Palácio barroco com três museus (Artes Decorativas, Belas-Artes, Arqueologia).'],
+  ['Musée Alsacien','v',48.5793,7.7506,'Vida tradicional alsaciana em casas ligadas entre si. Bilhete pago.'],
+  ['Place Gutenberg','m',48.5836,7.7480,'Mercado de Natal e estátua de Gutenberg, a 2 min de Kléber.'],
+  ['Marché-aux-Cochons-de-Lait','v',48.5817,7.7488,'Pequena praça pitoresca ao lado da catedral.'],
+  ['Ponts Couverts','v',48.5799,7.7378,'Pontes com torres medievais sobre o rio Ill, em Petite France.'],
+  ['Barrage Vauban','v',48.5793,7.7360,'Terraço panorâmico gratuito sobre as Pontes Cobertas.']]},
+{id:'egu',n:'Eguisheim',c:[48.0434,7.3066],
+ S:[['Rue du Rempart',1,ell([48.0434,7.3066],.0011,.0018)],['Rue des Rempart intérieur',0,ell([48.0434,7.3066],.0005,.0009)],
+  ['Grand\'Rue',0,[[48.0434,7.3040],[48.0434,7.3066]]]],
+ Q:[['Château Saint-Léon-IX','v',48.0434,7.3066,'Capela no centro da aldeia circular; ponto de partida do passeio.'],
+  ['Mercado de Natal','m',48.0433,7.3062,'Pequeno mercado na Place du Château, aberto sobretudo ao fim de semana (confirmar).'],
+  ['Église Saints-Pierre-et-Paul','v',48.0431,7.3057,'Igreja da aldeia, junto às ruas interiores.']]},
+{id:'rqw',n:'Riquewihr',c:[48.1667,7.2970],
+ S:[['Rue du Général de Gaulle',1,[[48.1668,7.2990],[48.1668,7.2970],[48.1667,7.2950]]],['Rue des Juifs',0,[[48.1668,7.2975],[48.1662,7.2978]]]],
+ Q:[['Le Dolder','v',48.1668,7.2971,'Torre-porta do século XIII com vista sobre a rua principal. Subida paga em certas épocas.'],
+  ['Tour des Voleurs','v',48.1666,7.2968,'Antiga prisão e câmara de tortura, hoje museu.'],
+  ['Mercado de Natal','m',48.1665,7.2960,'No pátio do castelo e na rua principal. Chega cedo: enche ao fim de semana.']]},
+{id:'kay',n:'Kaysersberg',c:[48.1388,7.2653],
+ S:[['Rue du Général de Gaulle',1,[[48.1395,7.2685],[48.1388,7.2655],[48.1383,7.2635],[48.1379,7.2618]]]],
+ Q:[['Pont fortifié','v',48.1383,7.2634,'Ponte do século XVI sobre o rio Weiss com capela. Foto obrigatória.'],
+  ['Église Sainte-Croix','v',48.1390,7.2664,'Igreja com retábulo do século XVI.'],
+  ['Château (ruínas)','v',48.1403,7.2653,'Pequena subida a pé; vista sobre a aldeia e as vinhas.']]}
+];
+
+const $=i=>document.getElementById(i);
+const EM={air:'✈️',city:'🎅',vil:'🏡',cast:'🏰',cath:'⛪',canal:'🚣',mkt:'🎄',st:'🚆',tram:'🚋'};
+const ALL=[],byId={};
+D.forEach(d=>ALL.push({id:d[0],n:d[1],lat:d[3],lon:d[4],em:EM[d[2]],col:K[d[2]][0],pr:K[d[2]][3],d:d[8],h:d[9],mk:d[7],tp:K[d[2]][2]}));
+T.forEach(t=>t.Q.forEach(([n,c,la,lo,tx])=>ALL.push({id:t.id+n,n,lat:la,lon:lo,em:C[c][0],col:C[c][1],pr:4,d:tx,h:'',mk:c=='m',tp:C[c][2],town:t.n})));
+ALL.forEach(a=>byId[a.id]=a);
+const STY=['liberty','bright','positron'].map(s=>'https://tiles.openfreemap.org/styles/'+s);let si=0,HL=[],MKO=0,orb=0;
+const map=new maplibregl.Map({container:'map',style:STY[0],center:[7.4,48.05],zoom:8.6,pitch:50,bearing:-12,maxZoom:20,maxPitch:78,attributionControl:{compact:true}});
+map.addControl(new maplibregl.NavigationControl({visualizePitch:true}),'top-left');
+map.addControl(new maplibregl.GeolocateControl({positionOptions:{enableHighAccuracy:true},trackUserLocation:true,showUserLocation:true}),'top-left');
+map.addControl(new maplibregl.ScaleControl({unit:'metric'}),'bottom-left');
+const LC={train:'#c0392b',bus:'#e08a1e',tram:'#7b3fb3'};
+const geo=()=>({type:'FeatureCollection',features:L.map((l,i)=>({type:'Feature',properties:{i,m:l[0]},geometry:{type:'LineString',coordinates:l[2].map(id=>[byId[id].lon,byId[id].lat])}}))});
+function paintHL(){if(!map.getLayer('rl'))return;map.setPaintProperty('rl','line-opacity',HL.length?['case',['in',['get','i'],['literal',HL]],1,.1]:1)}
+map.on('style.load',()=>{if(!map.getSource('r')){map.addSource('r',{type:'geojson',data:geo()});
+ map.addLayer({id:'rc',type:'line',source:'r',paint:{'line-color':'#fff','line-width':['interpolate',['linear'],['zoom'],8,5,15,10],'line-opacity':.85},layout:{'line-cap':'round'}});
+ map.addLayer({id:'rl',type:'line',source:'r',paint:{'line-color':['match',['get','m'],'train',LC.train,'bus',LC.bus,LC.tram],'line-width':['interpolate',['linear'],['zoom'],8,2.5,15,5]},layout:{'line-cap':'round'}})}paintHL()});
+map.on('error',e=>{const t=$('toast');t.textContent='Sem ligação aos mapas. Verifica a internet.';t.style.display='block';setTimeout(()=>t.style.display='none',4000)});
+ALL.forEach(a=>{const e=document.createElement('div');e.className='mk';e.innerHTML=`<i style="background:${a.col}">${a.em}</i><b>${a.n.split(' (')[0]}</b>`;e.onclick=ev=>{ev.stopPropagation();show(a,1)};a.e=e;new maplibregl.Marker({element:e,anchor:'bottom'}).setLngLat([a.lon,a.lat]).addTo(map)});
+const vis=()=>{const z=map.getZoom();ALL.forEach(a=>{a.e.classList.toggle('h',z<[0,9,10.5,12,14.5][a.pr]||(MKO&&!a.mk));a.e.classList.toggle('lb',z>=12.5)})};map.on('zoom',vis);vis();
+const gm=(a,m)=>`https://www.google.com/maps/${m}`;
+function show(a,fly){if(fly)map.flyTo({center:[a.lon,a.lat],zoom:Math.max(map.getZoom(),a.pr>=4?18:a.pr==0?14.5:16.5),pitch:62,bearing:map.getBearing()+25,duration:2200});
+ const q=encodeURIComponent(a.n+(a.town?', '+a.town:'')+', France');
+ $('shc').innerHTML=`<h2>${a.em} ${a.n}</h2><span class="tag">${a.tp}</span>${a.mk?'<span class="tag">🎄 Mercado de Natal</span>':''}<p>${a.d}</p>${a.h?`<p><b>Como chegar:</b> ${a.h}</p>`:''}${a.mk?`<p style="font-size:12px;color:#777">${MKT}</p>`:''}<a target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${q}&travelmode=walking">🚶 Ir a pé</a><a class="o" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${q}">🗺 Google Maps</a><a class="o" target="_blank" rel="noopener" href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${a.lat},${a.lon}">👁 Street View</a><button class="b" id="vb" onclick="tg3('${a.id}')">${window.ST&&ST['m|'+a.id]?'✔ Visitado':'☐ Já visitei'}</button>`;$('sh').classList.add('o')}
+$('x').onclick=()=>$('sh').classList.remove('o');map.on('click',()=>$('sh').classList.remove('o'));
+// chips
+const J=[['col','Colmar'],['str','Estrasburgo'],['egu','Eguisheim'],['rqw','Riquewihr'],['kay','Kaysersberg'],['baz','Basileia'],['mul','Mulhouse'],['obe','Obernai'],['rib','Ribeauvillé'],['sel','Sélestat'],['tur','Turckheim'],['hk','Haut-Kœnigsbourg']];
+$('ch').innerHTML=J.map(j=>`<button class="ch" data-j="${j[0]}">🔎 ${j[1]}</button>`).join('')+'<button class="ch" id="cm">🎄 Só mercados</button>';
+$('ch').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.id=='cm'){MKO=!MKO;b.classList.toggle('on',!!MKO);vis();return}const a=byId[b.dataset.j];map.flyTo({center:[a.lon,a.lat],zoom:15.6,pitch:64,bearing:map.getBearing()+30,duration:2800})};
+// pesquisa
+const q=$('q'),r=$('res');q.oninput=()=>{const v=q.value.trim().toLowerCase();if(v.length<2){r.style.display='none';return}const m=ALL.filter(a=>a.n.toLowerCase().includes(v)).slice(0,8);r.innerHTML=m.map(a=>`<div data-i="${ALL.indexOf(a)}">${a.em} ${a.n} <small>${a.town||a.tp}</small></div>`).join('')||'<div>Sem resultados</div>';r.style.display='block'};
+r.onclick=e=>{const d=e.target.closest('[data-i]');if(!d)return;r.style.display='none';q.value='';q.blur();show(ALL[d.dataset.i],1)};
+// ferramentas
+$('b3').onclick=e=>{const on=map.getPitch()<10;map.easeTo({pitch:on?62:0,bearing:on?map.getBearing():0,duration:900});e.currentTarget.classList.toggle('on',on)};
+$('bo').onclick=e=>{orb=!orb;e.currentTarget.classList.toggle('on',!!orb);const f=()=>{if(!orb)return;map.setBearing(map.getBearing()+.12);requestAnimationFrame(f)};if(orb)f()};
+map.on('dragstart',()=>{orb=0;$('bo').classList.remove('on')});
+$('bs').onclick=()=>{si=(si+1)%3;map.setStyle(STY[si])};
+// trajetos + Pai Natal animado
+let sa=null,raf=0;
+function santa(c){cancelAnimationFrame(raf);if(!c.length)return;if(!sa){const e=document.createElement('div');e.className='santa';e.textContent='🎅🛷';sa=new maplibregl.Marker({element:e}).setLngLat(c[0]).addTo(map)}
+ const n=c.length-1,dur=4500*n,t0=performance.now();const f=t=>{const u=((t-t0)%dur)/dur*n,i=Math.min(n-1,Math.floor(u)),k=u-i;sa.setLngLat([c[i][0]+(c[i+1][0]-c[i][0])*k,c[i][1]+(c[i+1][1]-c[i][1])*k]);raf=requestAnimationFrame(f)};raf=requestAnimationFrame(f)}
+function route(i){const t=TJ[i];HL=t[3];paintHL();let c=[];t[3].forEach(li=>{const s=L[li][2].map(id=>[byId[id].lon,byId[id].lat]);c=c.concat(s)});
+ const b=c.reduce((b,p)=>b.extend(p),new maplibregl.LngLatBounds(c[0],c[0]));map.fitBounds(b,{padding:{top:40,bottom:260,left:40,right:60},pitch:45,duration:1800,maxZoom:13});santa(c);
+ $('shc').innerHTML=`<h2>🧭 ${t[0]}</h2><span class="tag">${t[1]}</span><p>${t[2]}</p><p style="font-size:12px;color:#777">Confirma sempre linhas e horários.</p><button class="b" onclick="lista()">← Todos os trajetos</button>`}
+function lista(){HL=[];paintHL();cancelAnimationFrame(raf);if(sa){sa.remove();sa=null}$('shc').innerHTML='<h2>🧭 Trajetos</h2>'+TJ.map((t,i)=>`<div class="tj" onclick="route(${i})"><b>${t[0]}</b><br><small>${t[1]}</small></div>`).join('');$('sh').classList.add('o')}
+$('bt').onclick=lista;
+</script><script>(()=>{const NS='http://www.w3.org/2000/svg',$=i=>document.getElementById(i);let sd=7;const rnd=()=>(sd=sd*16807%2147483647)/2147483647;
+const O='stroke="#4a2c22" stroke-width="4" stroke-linejoin="round"';
+const DEFS=`<defs><linearGradient id="gr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c3e0a2"/><stop offset="1" stop-color="#a9cf86"/></linearGradient>
+<filter id="gl"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<filter id="sh"><feDropShadow dx="2" dy="4" stdDeviation="3" flood-opacity=".3"/></filter>
+<pattern id="st" width="16" height="10" patternUnits="userSpaceOnUse"><rect width="8" height="10" fill="#c0392b"/><rect x="8" width="8" height="10" fill="#fff"/></pattern>
+<symbol id="house" viewBox="0 0 100 100"><rect x="68" y="12" width="9" height="22" fill="#9a5a45" ${O}/><circle cx="73" cy="7" r="5" fill="#fff" opacity=".85"/><rect x="14" y="48" width="72" height="48" fill="currentColor" ${O}/><path d="M6 52L50 16L94 52Z" fill="#b5492f" ${O}/><path d="M6 52L50 16L94 52L86 52L50 25L14 52Z" fill="#fff"/><path d="M14 66H86M14 82H86M50 48V96M32 48V66M68 48V66" stroke="#7a4a3a" stroke-width="4"/><rect x="20" y="70" width="14" height="14" fill="#ffd36a" ${O}/><rect x="66" y="70" width="14" height="14" fill="#ffd36a" ${O}/><rect x="42" y="30" width="16" height="14" fill="#ffd36a" ${O}/><path d="M42 96V82Q50 74 58 82V96Z" fill="#6a4030"/></symbol>
+<symbol id="stall" viewBox="0 0 100 100"><rect x="12" y="50" width="76" height="44" fill="#9a6b4b" ${O}/><path d="M4 52L50 22L96 52Z" fill="url(#st)" ${O}/><path d="M50 4l3 8h9l-7 5 3 8-8-5-8 5 3-8-7-5h9z" fill="#ffd36a"/><rect x="18" y="62" width="64" height="12" fill="#ffd36a" ${O}/><circle cx="30" cy="58" r="4" fill="#fff" ${O}/><circle cx="50" cy="58" r="4" fill="#ff6b6b" ${O}/><circle cx="70" cy="58" r="4" fill="#fff" ${O}/><path d="M12 94V84M88 94V84" stroke="#5a3322" stroke-width="4"/></symbol>
+<symbol id="cath" viewBox="0 0 100 100"><path d="M37 0L29 36H45Z" fill="#d08a62" ${O}/><rect x="28" y="34" width="18" height="32" fill="#cf8d66" ${O}/><path d="M30 44H44M30 54H44" stroke="#5a3322" stroke-width="2"/><rect x="56" y="48" width="24" height="22" fill="#c98f68" ${O}/><path d="M54 48H82" stroke="#5a3322" stroke-width="4"/><rect x="10" y="62" width="80" height="34" fill="#cf8d66" ${O}/><path d="M24 62V96M76 62V96" stroke="#b8714d" stroke-width="5"/><circle cx="50" cy="76" r="10" fill="#ffd36a" ${O}/><path d="M50 66V86M40 76H60M43 69L57 83M57 69L43 83" stroke="#5a3322" stroke-width="1.6"/><path d="M30 96V88Q34 82 38 88V96ZM62 96V88Q66 82 70 88V96Z" fill="#4a3022"/><circle cx="37" cy="10" r="2" fill="#ffd36a"/><circle cx="35" cy="22" r="2" fill="#ffd36a"/></symbol>
+<symbol id="church" viewBox="0 0 100 100"><path d="M50 0L38 40H62Z" fill="#b5492f" ${O}/><rect x="38" y="38" width="24" height="30" fill="#cf8d66" ${O}/><circle cx="50" cy="52" r="6" fill="#fff" ${O}/><path d="M8 66L28 52H72L92 66Z" fill="#b5492f" ${O}/><rect x="14" y="64" width="72" height="32" fill="#d9a27a" ${O}/><path d="M22 96V82Q28 72 34 82V96ZM66 96V82Q72 72 78 82V96Z" fill="#ffd36a" ${O}/><path d="M44 96V80Q50 70 56 80V96Z" fill="#4a3022"/></symbol>
+<symbol id="dolder" viewBox="0 0 100 100"><path d="M22 34L50 4L78 34Z" fill="#b5492f" ${O}/><path d="M22 34L50 4L78 34L70 34L50 14L30 34Z" fill="#fff"/><rect x="28" y="32" width="44" height="64" fill="#e3c08e" ${O}/><path d="M28 50H72M28 72H72" stroke="#8a6a4a" stroke-width="2"/><circle cx="50" cy="44" r="8" fill="#fff" ${O}/><path d="M50 44V38M50 44H55" stroke="#333" stroke-width="2"/><path d="M38 96V78Q50 62 62 78V96Z" fill="#4a3022"/><rect x="33" y="56" width="8" height="12" fill="#ffd36a"/><rect x="59" y="56" width="8" height="12" fill="#ffd36a"/></symbol>
+<symbol id="koif" viewBox="0 0 100 100"><path d="M6 96V44L20 30L34 44L48 28L62 44L76 30L94 44V96Z" fill="#e8cfa6" ${O}/><path d="M2 46L50 14L98 46L90 48L50 24L10 48Z" fill="#c4572f" ${O}/><path d="M16 46L50 22L84 46" fill="none" stroke="#f2b84b" stroke-width="3" stroke-dasharray="4 4"/><path d="M14 96V76Q22 64 30 76V96ZM38 96V76Q46 64 54 76V96ZM62 96V76Q70 64 78 76V96Z" fill="#6a4030" ${O}/><rect x="20" y="52" width="12" height="12" fill="#ffd36a" ${O}/><rect x="44" y="52" width="12" height="12" fill="#ffd36a" ${O}/><rect x="68" y="52" width="12" height="12" fill="#ffd36a" ${O}/></symbol>
+<symbol id="palace" viewBox="0 0 100 100"><rect x="4" y="52" width="92" height="44" fill="#ead3ab" ${O}/><path d="M0 54L14 36H86L100 54Z" fill="#6b7280" ${O}/><path d="M0 54L14 36H86L100 54L94 54L82 42H18L6 54Z" fill="#fff"/><rect x="34" y="34" width="32" height="62" fill="#f1dcb8" ${O}/><path d="M30 36L50 14L70 36Z" fill="#9ca3af" ${O}/><path d="M30 36L50 14L70 36L64 36L50 22L36 36Z" fill="#fff"/><path d="M10 62H90M10 78H90" stroke="#b89868" stroke-width="3" stroke-dasharray="7 6"/><path d="M44 96V76Q50 68 56 76V96Z" fill="#4a3022"/><circle cx="50" cy="52" r="5" fill="#ffd36a" ${O}/></symbol>
+<symbol id="castle" viewBox="0 0 100 100"><rect x="6" y="56" width="88" height="40" fill="#c9a37a" ${O}/><path d="M6 56V48H18V56M30 56V48H42V56M58 56V48H70V56M82 56V48H94V56" fill="#c9a37a" ${O}/><rect x="40" y="26" width="20" height="40" fill="#d6b48c" ${O}/><path d="M36 28L50 6L64 28Z" fill="#b5492f" ${O}/><rect x="8" y="34" width="22" height="30" fill="#d6b48c" ${O}/><path d="M4 36L19 14L34 36Z" fill="#b5492f" ${O}/><rect x="44" y="44" width="12" height="14" fill="#ffd36a" ${O}/><path d="M42 96V80Q50 70 58 80V96Z" fill="#4a3022"/></symbol>
+<symbol id="bridge" viewBox="0 0 100 100"><rect x="2" y="30" width="22" height="64" fill="#cf8d66" ${O}/><rect x="76" y="30" width="22" height="64" fill="#cf8d66" ${O}/><rect x="39" y="38" width="22" height="56" fill="#cf8d66" ${O}/><path d="M-2 32L13 6L28 32ZM72 32L87 6L102 32ZM35 40L50 16L65 40Z" fill="#b5492f" ${O}/><path d="M24 74H39M61 74H76" stroke="#5a3322" stroke-width="10"/><path d="M24 94Q32 78 39 94M61 94Q68 78 76 94" fill="#6f9fc8" ${O}/><rect x="8" y="46" width="10" height="10" fill="#ffd36a"/><rect x="82" y="46" width="10" height="10" fill="#ffd36a"/></symbol>
+<symbol id="gate" viewBox="0 0 100 100"><rect x="8" y="30" width="24" height="66" fill="#cf8d66" ${O}/><rect x="68" y="30" width="24" height="66" fill="#cf8d66" ${O}/><path d="M4 32L20 6L36 32ZM64 32L80 6L96 32Z" fill="#b5492f" ${O}/><rect x="30" y="46" width="40" height="50" fill="#d9a27a" ${O}/><path d="M36 96V70Q50 52 64 70V96Z" fill="#3b2a20" ${O}/><circle cx="50" cy="38" r="5" fill="#ffd36a" ${O}/></symbol>
+<symbol id="well" viewBox="0 0 100 100"><ellipse cx="50" cy="88" rx="30" ry="9" fill="#9ca3af" ${O}/><rect x="24" y="66" width="52" height="24" fill="#b9bfc7" ${O}/><path d="M26 66V36M74 66V36" stroke="#5a3322" stroke-width="6"/><path d="M14 38L50 8L86 38Z" fill="#b5492f" ${O}/><path d="M14 38L50 8L86 38L78 38L50 16L22 38Z" fill="#fff"/><path d="M36 40V54M50 40V54M64 40V54" stroke="#4a2c22" stroke-width="2"/><rect x="31" y="54" width="10" height="8" fill="#8a5a3a"/><rect x="45" y="54" width="10" height="8" fill="#8a5a3a"/><rect x="59" y="54" width="10" height="8" fill="#8a5a3a"/></symbol>
+<symbol id="hall" viewBox="0 0 100 100"><rect x="6" y="40" width="88" height="56" fill="#f2b6a8" ${O}/><path d="M2 42L22 22L50 12L78 22L98 42Z" fill="#b5492f" ${O}/><path d="M2 42L22 22L50 12L78 22L98 42L90 42L50 20L10 42Z" fill="#fff"/><rect x="14" y="52" width="14" height="14" fill="#ffd36a" ${O}/><rect x="43" y="52" width="14" height="14" fill="#ffd36a" ${O}/><rect x="72" y="52" width="14" height="14" fill="#ffd36a" ${O}/><path d="M14 78H86" stroke="#c98f7a" stroke-width="3"/><path d="M42 96V80Q50 70 58 80V96Z" fill="#4a3022"/><circle cx="50" cy="30" r="7" fill="#fff" ${O}/></symbol>
+<symbol id="tree" viewBox="0 0 100 100"><rect x="44" y="84" width="12" height="14" fill="#6a4330"/><path d="M50 8L72 38H28Z M50 24L80 62H20Z M50 44L88 88H12Z" fill="#2f8a57" stroke="#1d5a3a" stroke-width="2.5" stroke-linejoin="round"/><path d="M50 8L60 22H40Z M50 24L62 40H38Z M50 44L64 62H36Z" fill="#fff" opacity=".85"/><path d="M50 0l3 7h8l-6 5 2 7-7-4-7 4 2-7-6-5h8z" fill="#ffd36a"/><circle cx="40" cy="54" r="3.5" fill="#ffd36a"/><circle cx="62" cy="72" r="3.5" fill="#ff6b6b"/><circle cx="34" cy="78" r="3.5" fill="#8cc4f7"/><circle cx="56" cy="34" r="3" fill="#ff6b6b"/></symbol>
+</defs>`;
+const G='#2f8a57';
+const TW={
+str:{n:'Estrasburgo',sb:'Grande Île · Mercados de Natal',w:1000,h:1240,
+ rv:[['M255 760 C235 530 385 330 565 322 C790 312 925 430 928 650 C930 860 800 1005 600 1028 C420 1048 275 960 255 760Z',46],['M-20 420 C120 330 330 235 560 230 C760 225 930 260 1040 300',40],['M928 640 C970 560 1010 420 1040 360',36],['M880 950 C950 1010 990 1120 1040 1250',36],['M520 1030 C510 1120 500 1190 480 1260',36],['M262 850 C190 900 150 960 -20 980',34],['M300 940 C340 1020 400 1070 500 1090',34]],
+ rd:[['M280 760 C262 560 400 360 570 352 C780 344 900 450 902 650 C904 840 785 975 600 995 C435 1012 298 930 280 760Z',12,1,140]],
+ ex:'<ellipse cx="275" cy="1150" rx="120" ry="42" fill="#e4f3fc" stroke="#fff" stroke-width="5"/>',
+ pois:[['cath',600,640,210,'CATEDRAL','Mercado tradicional',600,676,'middle'],['tree',440,545,150,'PLACE KLÉBER','Grande árvore de Natal',440,572,'middle'],['palace',810,455,130,'PLACE BROGLIE','Christkindelsmärik',810,500,'middle'],['bridge',110,650,170,'PETITE FRANCE','Mercado tradicional',140,500,'middle'],['house',190,830,100,'','',0,0,''],['house',350,840,110,'PLACE DES MEUNIERS','Produtos da Alsácia',420,905,'middle'],['palace',730,945,170,'PALAIS ROHAN','Mercado gourmet',630,915,'end'],['bridge',300,1130,210,'BARRAGE VAUBAN','Vista panorâmica da cidade',250,1196,'middle']],
+ tr:[[120,200,100],[890,170,110],[900,1120,100],[110,1090,100],[620,1190,70],[560,1130,60]],cl:[[600,800,10,130],[760,640,9,100],[470,720,8,90],[830,420,6,50]]},
+col:{n:'Colmar',sb:'Petite Venise · Mercados de Natal',w:1000,h:900,
+ rv:[['M-20 700 C200 640 420 745 620 690 C800 650 900 705 1040 725',44]],
+ rd:[['M150 360 C300 330 520 410 860 420',22,0,0],['M300 250 L520 400 L640 560',18,1,95],['M120 540 C300 520 600 520 880 540',18,-1,95]],
+ pois:[['koif',560,480,150,'KOÏFHUS','Antiga alfândega',620,505,'start'],['church',480,400,160,'SAINT-MARTIN','',330,375,'end'],['house',400,300,110,'MAISON PFISTER','Casa de 1537',470,250,'start'],['house',330,455,100,'MAISON DES TÊTES','',250,500,'middle'],['bridge',650,640,190,'PETITE VENISE','Canais e casas coloridas',700,700,'middle'],['palace',180,330,150,'UNTERLINDEN','Museu',180,365,'middle'],['stall',500,640,95,'MARCHÉ COUVERT','',470,675,'end']],
+ tr:[[90,120,100],[900,150,100],[900,800,90],[100,800,90]],cl:[[320,520,9,90],[700,470,7,70]]},
+egu:{n:'Eguisheim',sb:'Aldeia circular · Rota dos Vinhos',w:1000,h:900,
+ rv:[],rd:[['M170 450 C170 250 340 190 500 190 C660 190 830 250 830 450 C830 650 660 710 500 710 C340 710 170 650 170 450Z',22,-1,115],['M310 450 C310 340 400 310 500 310 C600 310 690 340 690 450 C690 560 600 590 500 590 C400 590 310 560 310 450Z',18,1,100]],
+ pois:[['castle',500,470,160,'CHÂTEAU SAINT-LÉON','Praça do castelo',500,500,'middle'],['church',330,440,110,'IGREJA','',330,470,'middle'],['stall',620,440,90,'MERCADO DE NATAL','',700,520,'middle']],
+ tr:[[100,130,90],[900,130,90],[110,790,80],[890,780,80]],cl:[[500,560,7,70]]},
+rqw:{n:'Riquewihr',sb:'A pérola do vinhedo',w:1000,h:800,rv:[],
+ rd:[['M60 420 C300 395 700 395 940 425',40,0,90],['M500 410 C510 500 540 560 600 650',18,1,95]],
+ pois:[['dolder',500,385,170,'LE DOLDER','Torre-porta medieval',500,215,'middle'],['dolder',590,520,120,'TOUR DES VOLEURS','Museu',680,530,'start'],['stall',780,380,100,'MERCADO DE NATAL','Pátio do castelo',790,320,'middle'],['gate',110,415,120,'PORTE HAUTE','',110,460,'middle']],
+ tr:[[100,140,100],[900,130,100],[130,700,90],[880,690,90]],cl:[[740,430,8,70]]},
+kay:{n:'Kaysersberg',sb:'Terra de Albert Schweitzer',w:1000,h:800,
+ rv:[['M-20 520 C300 470 500 570 1040 500',40]],rd:[['M110 330 C350 420 650 450 890 400',24,0,95]],
+ pois:[['bridge',520,500,200,'PONT FORTIFIÉ','Séc. XVI sobre o Weiss',520,560,'middle'],['castle',470,190,170,'CHÂTEAU','Ruínas e vista',470,215,'middle'],['church',320,370,150,'ÉGLISE STE-CROIX','',250,410,'end'],['house',650,410,110,'CASA SCHWEITZER','',720,350,'start']],
+ tr:[[90,110,100],[910,120,100],[120,700,90],[890,690,90]],cl:[[760,470,6,60]]},
+obe:{n:'Obernai',sb:'Praça do Mercado · Natal',w:1000,h:900,rv:[['M-20 770 C250 700 500 810 760 745 C880 715 960 745 1040 730',34]],rd:[['M170 300 C170 200 830 200 830 300L830 620C830 720 170 720 170 620Z',20,-1,125],['M500 215L500 705',16,0,0],['M185 460L815 460',16,0,0]],ex:'<rect x="400" y="385" width="200" height="150" rx="26" fill="#fffbea" stroke="#b9a06a" stroke-width="6"/>',pois:[['hall',500,345,150,'HÔTEL DE VILLE','Praça do Mercado',0,0,''],['well',420,510,100,'PUITS AUX SIX SEAUX','Fonte do séc. XVI',0,0,''],['dolder',740,350,140,'TOUR DE LA CHAPELLE','Torre medieval',0,0,''],['church',260,360,150,'ÉGLISE ST-PIERRE','',0,0,'']],tr:[[90,150,100],[910,160,100],[110,800,90],[900,810,90]],cl:[[570,470,9,80]]},
+rib:{n:'Ribeauvillé',sb:'Três castelos · Grand Rue',w:1000,h:900,rv:[['M-20 790 C300 740 600 800 1040 760',30]],rd:[['M80 660C330 570 560 480 920 420',26,0,100],['M300 600L240 780',16,1,110]],ex:'<g stroke="#7fae5e" stroke-width="7" opacity=".75" fill="none"><path d="M640 330C720 360 820 350 940 330"/><path d="M620 380C720 410 830 400 950 380"/><path d="M600 430C710 460 830 450 960 430"/></g>',pois:[['dolder',520,490,160,'TOUR DES BOUCHERS','Torre-porta da Grand Rue',0,0,''],['well',650,560,100,'FONTAINE DU VIGNERON','',0,0,''],['church',320,620,140,'ST-GRÉGOIRE','',0,0,''],['castle',700,210,130,'GIERSBERG','castelo em ruínas',0,0,''],['castle',430,170,130,'ST-ULRICH','castelo em ruínas',0,0,''],['castle',170,230,110,'HAUT-RIBEAUPIERRE','',0,0,'']],tr:[[900,780,100],[90,820,90],[880,640,90]],cl:[[400,500,7,70]]},
+tur:{n:'Turckheim',sb:'Portas medievais · Vigia noturno',w:1000,h:900,rv:[['M-20 720 C300 650 700 770 1040 690',32]],rd:[['M30 450C300 430 700 430 970 450',30,0,100],['M500 440L500 600',16,0,0]],pois:[['gate',150,455,170,'PORTE DE FRANCE','Entrada oeste',0,0,''],['gate',850,455,170,'PORTE DU BRAND','Entrada leste',0,0,''],['hall',500,380,140,'HÔTEL DE VILLE','Ronda do vigia',0,0,''],['church',650,320,140,'ÉGLISE STE-ANNE','',0,0,''],['stall',360,530,100,'MERCADO DE NATAL','',0,0,'']],tr:[[100,160,100],[900,150,100],[130,820,90]],cl:[[470,560,8,70]]},
+sel:{n:'Sélestat',sb:'Humanismo · Castelo na colina',w:1000,h:900,rv:[['M-20 700 C300 640 600 760 1040 700',34]],rd:[['M140 480C300 420 700 420 880 480',22,0,100],['M500 300L500 650',16,0,0]],pois:[['hall',400,430,150,'BIBLIOTHÈQUE HUMANISTE','Tesouro do Renascimento',0,0,''],['church',650,420,170,'ÉGLISE ST-GEORGES','Gótica',0,0,''],['church',230,560,130,'STE-FOY','Românica',0,0,''],['dolder',540,590,130,'TOUR HORLOGE','',0,0,''],['tree',300,330,110,'ÁRVORES DE NATAL','',0,0,''],['castle',850,190,170,'HAUT-KŒNIGSBOURG','a 10 km · castelo',0,0,'']],tr:[[100,170,100],[110,820,90],[900,800,90]],cl:[[560,490,7,70]]},
+mul:{n:'Mulhouse',sb:'Place de la Réunion · Natal',w:1000,h:900,rv:[['M-20 790 C300 730 700 820 1040 760',34]],rd:[['M150 330C150 250 850 250 850 330L850 640C850 720 150 720 150 640Z',20,-1,130],['M500 250L500 710',16,0,0]],ex:'<rect x="330" y="360" width="340" height="190" rx="30" fill="#fffbea" stroke="#b9a06a" stroke-width="6"/>',pois:[['hall',500,400,170,'HÔTEL DE VILLE','Fachada pintada',0,0,''],['church',720,330,170,'TEMPLE ST-ÉTIENNE','Vitrais do séc. XIV',0,0,''],['dolder',270,420,140,'TOUR DU BOLLWERK','',0,0,''],['stall',440,520,100,'MARCHÉ DE NOËL','Place de la Réunion',0,0,'']],tr:[[100,160,100],[900,150,100],[120,830,90]],cl:[[520,490,10,80]]}};
+
+let ST={};try{ST=JSON.parse(localStorage.getItem('alsacia_v')||'{}')}catch(e){}window.ST=ST;const sv=()=>{try{localStorage.setItem('alsacia_v',JSON.stringify(ST))}catch(e){}};
+window.tg3=id=>{ST['m|'+id]=!ST['m|'+id];sv();mk3();const b=$('vb');if(b)b.textContent=ST['m|'+id]?'✔ Visitado':'☐ Já visitei'};
+const mk3=()=>{try{ALL.forEach(a=>a.e&&a.e.classList.toggle('vis',!!ST['m|'+a.id]))}catch(e){}};mk3();
+const H=document.createElementNS(NS,'svg');H.style.cssText='position:absolute;width:0;height:0';document.body.appendChild(H);const mp=document.createElementNS(NS,'path');H.appendChild(mp);
+const U=i=>`<use href="#${i.s}" x="${i.x-i.w/2}" y="${i.y-i.w}" width="${i.w}" height="${i.w}" style="color:${i.c||'#f3e0bd'}" filter="url(#sh)"/>`;
+const PAL=['#f3e0bd','#f7c6c0','#c7dff2','#cfe8c0','#f9e08a','#e8c1e8'];const SC=1.45,SZ=.82;Object.values(TW).forEach(t=>{t.w*=SC;t.h*=SC;t.pois.forEach(p=>{p[1]*=SC;p[2]*=SC;p[3]=Math.round(p[3]*SZ)});t.tr.forEach(a=>{a[0]*=SC;a[1]*=SC;a[2]*=SZ});(t.cl||[]).forEach(a=>{a[0]*=SC;a[1]*=SC;a[3]*=SC})});const PR=['🎁','⛄','🦌','🔔','🍪','⭐','🧦','🕯️','🍷'];
+function build(id){const t=TW[id];sd=11;const it=[],lb=[],oc=[];
+ const hit=(a,b)=>Math.abs(a[0]-b[0])<(a[2]+b[2])/2+6&&Math.abs(a[1]-b[1])<(a[3]+b[3])/2+6;
+ const free=(cx,cy,w,h)=>cx-w/2>40&&cx+w/2<t.w-40&&cy-h/2>150&&cy+h/2<t.h-40&&!oc.some(o=>hit(o,[cx,cy,w,h]));
+ CURP=[];t.pois.forEach(p=>{oc.push([p[1],p[2]-p[3]*.4,p[3]*.8,p[3]*.9]);if(!p[4])it.push({s:p[0],x:p[1],y:p[2],w:p[3],c:'#f3e0bd'})});
+ const tf=`transform="scale(${SC})"`;let s=`<rect width="${t.w}" height="${t.h}" fill="url(#gr)"/>`;for(let i=0;i<10;i++)s+=`<ellipse cx="${rnd()*t.w}" cy="${rnd()*t.h}" rx="${110+rnd()*150}" ry="${40+rnd()*50}" fill="#fff" opacity=".35"/>`;
+ t.rv.forEach(([d,w])=>s+=`<path ${tf} d="${d}" fill="none" stroke="#3f6f98" stroke-width="${w+14}" stroke-linecap="round"/>`);t.rv.forEach(([d,w])=>s+=`<path ${tf} d="${d}" fill="none" stroke="#bfdcf3" stroke-width="${w}" stroke-linecap="round"/>`);
+ t.rv.forEach(([d])=>{mp.setAttribute('d',d);const L=mp.getTotalLength();for(let l=70;l<L;l+=130+rnd()*90){const q=mp.getPointAtLength(l);s+=`<ellipse cx="${q.x*SC+rnd()*16-8}" cy="${q.y*SC+rnd()*16-8}" rx="${15+rnd()*12}" ry="${7+rnd()*4}" fill="#fff" opacity=".92" transform="rotate(${rnd()*40-20} ${q.x*SC} ${q.y*SC})"/>`}});
+ t.rd.forEach(([d,w])=>s+=`<path ${tf} d="${d}" fill="none" stroke="#b9a06a" stroke-width="${w+8}" stroke-linecap="round"/><path ${tf} d="${d}" fill="none" stroke="#fffbea" stroke-width="${w}" stroke-linecap="round"/>`);
+ s+=`<g ${tf}>${t.ex||''}</g>`;t.rd.forEach(([d,w])=>{if(w>=12)s+=`<path d="${d}" transform="scale(${SC}) translate(0 -26)" fill="none" stroke="#d7263d" stroke-width="11" stroke-dasharray="12 40"/><path d="${d}" transform="scale(${SC}) translate(0 -26)" fill="none" stroke="#1f9d55" stroke-width="11" stroke-dasharray="12 40" stroke-dashoffset="-20"/><path class="tw" d="${d}" transform="scale(${SC}) translate(0 -6)" fill="none" stroke="#ffd36a" stroke-width="7" stroke-linecap="round" stroke-dasharray="0 16" filter="url(#gl)"/>`});
+ const pe=[];(t.cl||[]).forEach(([cx,cy,N,r])=>{for(let i=0,n=0;i<N*14&&n<N;i++){const A=rnd()*6.28,d=Math.sqrt(rnd())*r,x=cx+Math.cos(A)*d,y=cy+Math.sin(A)*d*.8;if(free(x,y-22,48,46)){n++;it.push({s:'stall',x,y,w:46});oc.push([x,y-22,48,46]);if(n%2)pe.push([x+(rnd()*30-15),y+14+rnd()*8,PAL[rnd()*6|0]])}}});
+ t.rd.forEach(([d,w,sd_,sp])=>{if(!sp)return;mp.setAttribute('d',d);const L=mp.getTotalLength();for(let l=sp/2;l<L;l+=sp*(.85+rnd()*.3)){const q=mp.getPointAtLength(l),r2=mp.getPointAtLength(l+1),dx=r2.x-q.x,dy=r2.y-q.y,n=Math.hypot(dx,dy)||1,o=w/2*SC+44;(sd_?[sd_]:[1,-1]).forEach(g=>{const x=q.x*SC-dy/n*o*g,y=q.y*SC+dx/n*o*g,st=rnd()<.22,z=st?44:50+rnd()*8;if(free(x,y-z/2,z+4,z)){it.push({s:st?'stall':'house',x,y,w:z,c:PAL[rnd()*6|0]});oc.push([x,y-z/2,z+4,z])}})}});
+ t.tr.forEach(([x,y,w])=>{if(free(x,y-w*.4,w*.7,w*.85)){it.push({s:'tree',x,y,w});oc.push([x,y-w*.4,w*.7,w*.85])}});
+ for(let i=0,n=0;i<400&&n<22;i++){const x=rnd()*t.w,y=rnd()*t.h,w=56+rnd()*26;if(free(x,y-w*.4,w*.7,w*.85)){n++;it.push({s:'tree',x,y,w});oc.push([x,y-w*.4,w*.7,w*.85])}}
+ const pr=[];for(let i=0,n=0;i<400&&n<14;i++){const x=rnd()*t.w,y=rnd()*t.h;if(free(x,y-14,34,34)){n++;pr.push({e:PR[n%PR.length],x,y});oc.push([x,y-14,34,34])}}
+ it.push(...pr);it.sort((A,B_)=>A.y-B_.y);
+ s+=it.map(i=>i.e?`<text x="${i.x}" y="${i.y}" font-size="30" text-anchor="middle">${i.e}</text>`:`<ellipse cx="${i.x}" cy="${i.y-2}" rx="${i.w*.55}" ry="${i.w*.1}" fill="#fff" opacity=".9"/>`+(i.p&&i.p[4]?`<g class="p${ST[id+'|'+i.p[4]]?' v':''}" data-k="${id}|${i.p[4]}">${U(i)}<g transform="translate(${i.x+i.w*.36} ${i.y-i.w*.9})"><circle class="bc" r="18" stroke="#d4a017" stroke-width="4"/><text class="bt" y="7" text-anchor="middle">${ST[id+'|'+i.p[4]]?'✔':'+'}</text></g></g>`:U(i))).join('');
+ s+=pe.map(q=>`<g transform="translate(${q[0]} ${q[1]})"><circle cy="-13" r="4.5" fill="#f5d0b0"/><rect x="-5" y="-9" width="10" height="13" rx="4" fill="${q[2]}"/><rect x="-5" y="-9" width="10" height="4" rx="2" fill="#c0392b"/></g>`).join('');
+ let po='';t.pois.forEach((p,i)=>{if(!p[4])return;const key=id+'|'+p[4],v=!!ST[key],z=Math.max(40,Math.min(60,Math.round(p[3]*.4)));CURP.push({id:key,x:p[1],y:p[2],z,nm:p[4],rank:i-p[3]/1000});
+  po+=`<g class="p${v?' v':''}" data-k="${key}" transform="translate(${p[1]} ${p[2]})"><g class="sc"><ellipse cy="-2" rx="${z*.45}" ry="${z*.08}" fill="#fff" opacity=".7"/><use href="#${p[0]}" x="${-z/2}" y="${-z}" width="${z}" height="${z}" style="color:#f3e0bd" filter="url(#sh)"/><g transform="translate(${z*.36} ${-z*.9})"><circle class="bc" r="9" stroke="#d4a017" stroke-width="2.5"/><text class="bt" y="4" text-anchor="middle">${v?'✔':'+'}</text></g><text class="nm" y="15" text-anchor="middle">${p[4]}</text><text class="d2" y="${-z-8}" font-size="15" text-anchor="middle">⛄ 🎅 🎁</text></g></g>`});s+=po;
+ for(let i=0;i<70;i++)s+=`<circle cx="${rnd()*t.w}" cy="${rnd()*t.h}" r="${1+rnd()*2.4}" fill="#fff" opacity=".8"/>`;
+ s+=`<rect x="16" y="16" width="${t.w-32}" height="${t.h-32}" rx="30" fill="none" stroke="#b3202a" stroke-width="18"/><rect x="16" y="16" width="${t.w-32}" height="${t.h-32}" rx="30" fill="none" stroke="#ffd36a" stroke-width="5" stroke-dasharray="2 20" stroke-linecap="round"/><text font-size="52"><animateMotion dur="30s" repeatCount="indefinite" path="M-90 140 C${t.w*.3} 40 ${t.w*.6} 240 ${t.w+90} 110"/>🎅🛷</text>`;
+ return`<g id="ig">${s}</g>`}
+const el=document.createElement('div');el.id='il';el.innerHTML=`<svg id="is">${DEFS}</svg><div id="ih"><h2 id="itl"></h2><small id="isb"></small><small id="ipg"></small><div class="row" id="itb"></div></div><div id="ic"><button id="iz">+</button><button id="im">−</button><button id="ir">⟲</button><button id="iw">📋</button><button id="iv">🗺</button><button id="ix">✕</button></div><div id="ik"><button id="kx">✕</button><div id="kc"></div></div><div id="iy"><button id="yx">✕</button><div id="yc"></div></div>`;document.body.appendChild(el);
+const S=$('is');let k=1,tx=0,ty=0,k0=1,cur='str',CURP=[],FOC=null;
+const ap=()=>{const r=S.getBoundingClientRect(),tt=TW[cur],hh=$('ih').offsetHeight*.5,WW=tt.w*k,HH=tt.h*k;tx=WW<=r.width?(r.width-WW)/2:Math.min(0,Math.max(r.width-WW,tx));ty=HH<=r.height?(r.height-HH)/2:Math.min(hh,Math.max(r.height-HH,ty));$('ig').setAttribute('transform',`translate(${tx} ${ty}) scale(${k})`);S.classList.toggle('z2',k/k0>2.6);dec()};
+function dec(){const els=S.querySelectorAll('.p');if(!els.length)return;const by={},acc=[],r=S.getBoundingClientRect();els.forEach(g=>by[g.dataset.k]=g);
+ CURP.slice().sort((a,b)=>(b.id==FOC)-(a.id==FOC)||a.rank-b.rank).forEach(p=>{const g=by[p.id];if(!g)return;g.firstChild.setAttribute('transform',`scale(${1/k})`);const sx=tx+p.x*k,sy=ty+p.y*k,hw=Math.max(p.z/2,p.nm.length*4.7+4),bx=[sx-hw-3,sy-p.z-3,sx+hw+3,sy+20],off=sx<-60||sx>r.width+60||sy<-80||sy>r.height+80,hit=acc.some(c=>bx[0]<c[2]&&bx[2]>c[0]&&bx[1]<c[3]&&bx[3]>c[1]);if(hit&&p.id!=FOC)g.setAttribute('display','none');else{g.removeAttribute('display');if(!off)acc.push(bx)}})}
+function focusP(key){const p=CURP.find(q=>q.id==key);if(!p)return;FOC=key;const r=S.getBoundingClientRect();k=k0*6;tx=r.width/2-p.x*k;ty=r.height*.42-p.y*k;ap();card(key)}
+const names=id=>TW[id].pois.filter(p=>p[4]);const cnt=id=>names(id).filter(p=>ST[id+'|'+p[4]]).length;
+const prog=()=>{let a=0,b=0;Object.keys(TW).forEach(i=>{a+=cnt(i);b+=names(i).length});$('ipg').textContent=`✔ ${cnt(cur)}/${names(cur).length} aqui · ${a}/${b} no total`;S.querySelectorAll('.p').forEach(g=>{const v=!!ST[g.dataset.k];g.classList.toggle('v',v);g.querySelector('.bt').textContent=v?'✔':'+'})};
+const fit=()=>{const r=S.getBoundingClientRect(),t=TW[cur],hh=$('ih').offsetHeight+6;k0=Math.min(r.width/t.w,(r.height-hh)/t.h)*.98;k=k0*1.75;const P=names(cur),cx=P.reduce((a,p)=>a+p[1],0)/P.length,cy=P.reduce((a,p)=>a+p[2],0)/P.length-60;tx=r.width/2-cx*k;ty=hh+(r.height-hh)/2-cy*k;ap()};
+const zoom=(f,cx,cy)=>{const n=Math.max(k0*.8,Math.min(k0*14,k*f));f=n/k;tx=cx-(cx-tx)*f;ty=cy-(cy-ty)*f;k=n;ap()};
+function show(id){cur=id;FOC=null;$('ik').classList.remove('o');S.querySelector('#ig')?.remove();S.insertAdjacentHTML('beforeend',build(id));$('itl').textContent=TW[id].n;$('isb').textContent=TW[id].sb;[...$('itb').children].forEach(b=>b.classList.toggle('on',b.dataset.i==id));fit();prog()}
+function card(k_){const[id,n]=k_.split('|'),p=TW[id].pois.find(p=>p[4]==n),v=!!ST[k_];$('kc').innerHTML=`<h3>${n}</h3>${p[5]?`<p>${p[5]}</p>`:''}<button class="vbtn${v?' v':''}" data-k="${k_}">${v?'✔ Já visitei':'☐ Marcar como visitado'}</button><input id="kn" placeholder="Notas: hora, bilhete, reserva…" value="${(ST['n|'+k_]||'').replace(/"/g,'&quot;')}">`;$('ik').classList.add('o');$('kn').oninput=e=>{ST['n|'+k_]=e.target.value;sv()}}
+$('kc').onclick=e=>{const b=e.target.closest('.vbtn');if(!b)return;const q=b.dataset.k;ST[q]=!ST[q];sv();card(q);prog();lst()};$('kx').onclick=()=>$('ik').classList.remove('o');
+function lst(){$('yc').innerHTML='<h3>📋 A minha viagem</h3>'+Object.keys(TW).map(i=>`<h4>${TW[i].n} <small>${cnt(i)}/${names(i).length}</small></h4>`+names(i).map(p=>`<label><input type="checkbox" data-k="${i}|${p[4]}" ${ST[i+'|'+p[4]]?'checked':''}> <span data-f="${i}|${p[4]}">${p[4]}</span></label>`).join('')).join('')}
+$('yc').onclick=e=>{const s=e.target.closest('[data-f]');if(!s)return;e.preventDefault();const f=s.dataset.f,t=f.split('|')[0];$('iy').classList.remove('o');if(cur!=t)show(t);focusP(f)};$('yc').onchange=e=>{const q=e.target.dataset.k;if(q){ST[q]=e.target.checked;sv();prog();lst()}};$('iw').onclick=()=>{lst();$('iy').classList.toggle('o')};$('yx').onclick=()=>$('iy').classList.remove('o');
+$('itb').innerHTML=Object.keys(TW).map(i=>`<button data-i="${i}">${TW[i].n}</button>`).join('');$('itb').onclick=e=>{if(e.target.dataset.i){$('ik').classList.remove('o');show(e.target.dataset.i)}};
+$('bi').onclick=()=>{el.classList.add('o');show(cur)};$('ix').onclick=()=>el.classList.remove('o');$('ir').onclick=fit;
+$('iz').onclick=()=>zoom(1.5,innerWidth/2,innerHeight/2);$('im').onclick=()=>zoom(1/1.5,innerWidth/2,innerHeight/2);
+$('iv').onclick=()=>{el.classList.remove('o');const a=byId[cur];map.flyTo({center:[a.lon,a.lat],zoom:cur=='str'?15.2:15.8,pitch:62,bearing:-20,duration:2500})};
+S.onwheel=e=>{e.preventDefault();zoom(Math.exp(-e.deltaY*.002),e.clientX,e.clientY)};
+const pt=new Map();let pd=0,dn=null;S.onpointerdown=e=>{dn={x:e.clientX,y:e.clientY,t:e.target};S.setPointerCapture(e.pointerId);pt.set(e.pointerId,[e.clientX,e.clientY]);if(pt.size==2){dn=null;const[a,b]=[...pt.values()];pd=Math.hypot(a[0]-b[0],a[1]-b[1])}};
+S.onpointermove=e=>{if(!pt.has(e.pointerId))return;const o=pt.get(e.pointerId);pt.set(e.pointerId,[e.clientX,e.clientY]);if(pt.size==2){const[a,b]=[...pt.values()],d=Math.hypot(a[0]-b[0],a[1]-b[1]);zoom(d/pd,(a[0]+b[0])/2,(a[1]+b[1])/2);pd=d}else{tx+=e.clientX-o[0];ty+=e.clientY-o[1];ap()}};
+S.onpointerup=e=>{pt.delete(e.pointerId);if(dn&&Math.hypot(e.clientX-dn.x,e.clientY-dn.y)<7){const g=dn.t.closest&&dn.t.closest('.p');if(g)card(g.dataset.k)}dn=null};S.onpointercancel=e=>pt.delete(e.pointerId);
+addEventListener('resize',()=>el.classList.contains('o')&&fit());
+
+// ---- música de Natal: faixas da pasta audio/ por ordem aleatória (sem repetir até tocarem todas)
+{let TR=["audio/all-i-want.m4a", "audio/las-christmas.m4a", "audio/polar-express.m4a", "audio/misteltoe.m4a", "audio/we-are-the-world.m4a", "audio/jingle-bell-rock.m4a", "audio/noite-branca.m4a", "audio/rock-a-round.m4a", "audio/they-know-its-christmas.m4a", "audio/halleluyah.m4a", "audio/a-todos-um-bom-natal.m4a", "audio/look-like-christmas.m4a"];fetch('audio/musicas.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(a=>{if(Array.isArray(a)&&a.length){TR=a.map(x=>'audio/'+encodeURIComponent(x));bag=[]}}).catch(()=>{});let bag=[],last=-1,au=null,on=false,muted=false,warned=false,fails=0;try{muted=localStorage.getItem('alsacia_mute')=='1'}catch(e){}
+const bs=[],set=v=>{on=v;bs.forEach(b=>b.classList.toggle('on',v))},sm=v=>{muted=v;try{localStorage.setItem('alsacia_mute',v?'1':'0')}catch(e){}};
+const pick=()=>{if(!bag.length){bag=TR.map((_,i)=>i).sort(()=>Math.random()-.5);if(bag.length>1&&bag[0]==last)bag.push(bag.shift())}last=bag.shift();return TR[last]};
+const go=()=>{au.src=pick();return au.play().then(()=>set(true)).catch(()=>set(false))};
+const init=()=>{if(au)return;au=new Audio();au.preload='auto';au.onended=go;au.onerror=()=>{fails++;if(fails>=TR.length){set(false);if(!warned){warned=true;alert('Não encontrei a música. Coloca a pasta "audio" junto do mapa.html.')}return}go()};au.onplaying=()=>{fails=0}};
+const play=()=>{init();if(!au.src)go();else au.play().then(()=>set(true)).catch(()=>set(false))};
+const tgl=()=>{if(on){au.pause();set(false);sm(true)}else{sm(false);play()}};
+const mk=(p,bf,t,ti,fn,tg)=>{const b=document.createElement('button');b.textContent=t;b.title=ti;b.setAttribute('aria-label',ti);bf?p.insertBefore(b,bf):p.appendChild(b);b.onclick=fn;if(tg)bs.push(b);return b};
+[[$('ic'),$('ix')],[document.querySelector('.tools'),null]].forEach(([p,bf])=>{const m=mk(p,bf,'🎵','Música de Natal',tgl,1);if(p.id=='ic')m.id='imu';mk(p,bf,'⏭','Próxima música',()=>{init();sm(false);go()})});
+$('bi').addEventListener('click',()=>{if(!muted&&!on)play()});$('ix').addEventListener('click',()=>{if(on){au.pause();set(false)}});
+const st=document.createElement('style');st.textContent='#ic button.on,.tools button.on{background:#2fbf71;color:#fff}.mk.pt b{display:block!important}';document.head.appendChild(st)}
+// ---- 2 pontos marcados (localizados em tempo real no OpenStreetMap)
+{const PT=[['pt1','Rue de Stutzheim','Rue de Stutzheim, Strasbourg','Estrasburgo'],['pt2','Rue du Grillenbreit','Rue du Grillenbreit, Colmar','Colmar']];
+const geo=async q=>{const k='geo|'+q;try{const c=localStorage.getItem(k);if(c)return JSON.parse(c)}catch(e){}const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=fr&q='+encodeURIComponent(q));const j=await r.json();if(!j[0])return null;const v=[+j[0].lon,+j[0].lat];try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}return v};
+let pend=PT.length,bad=[];const say=t=>{const e=$('toast');e.style.background='#1f6a45';e.textContent=t;e.style.display='block';setTimeout(()=>e.style.display='none',6000)};PT.forEach(async([id,n,q,town])=>{try{const v=await geo(q);if(!v){bad.push(n);return}const a={id,n,lat:v[1],lon:v[0],em:'📍',col:'#c0392b',pr:0,d:'Ponto marcado: '+n+', '+town+'.',h:'',mk:false,tp:'Ponto marcado',town};const e=document.createElement('div');e.className='mk pt';e.innerHTML=`<i style="background:#c0392b">📍</i><b>${n}</b>`;e.onclick=ev=>{ev.stopPropagation();show(a,1)};a.e=e;new maplibregl.Marker({element:e,anchor:'bottom'}).setLngLat(v).addTo(map);ALL.push(a);byId[id]=a;const b=document.createElement('button');b.className='ch';b.dataset.j=id;b.textContent='📍 '+n.replace('Rue ','');$('ch').insertBefore(b,$('cm'))}catch(e){bad.push(n)}finally{if(!--pend)say(bad.length?'📍 Não localizei: '+bad.join(', '):'📍 2 pontos marcados no mapa')}})}
+
+// ---- ligação profunda a partir do roteiro: #ilus=col | #fly=col | #find=Nome%2C%20Cidade&pid=ID&d=1
+window.openIlus=id=>{if(id&&TW[id])cur=id;el.classList.add('o');show(cur)};
+{const say=t=>{const e=$('toast');e.style.background='#1f6a45';e.textContent=t;e.style.display='block';setTimeout(()=>e.style.display='none',5000)};
+const he=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const gq=async q=>{const k='geo|'+q;try{const c=localStorage.getItem(k);if(c)return JSON.parse(c)}catch(e){}const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encodeURIComponent(q));const j=await r.json();if(!j[0])return null;const v=[+j[0].lon,+j[0].lat];try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}return v};
+let fm=null;
+const find=async(q,pid,done)=>{el.classList.remove('o');const nm=q.split(',')[0];let v=null;try{v=await gq(q)}catch(e){}if(!v){say('Não encontrei "'+nm+'" no mapa.');return}
+ if(fm)fm.remove();const e=document.createElement('div');e.className='mk pt';e.innerHTML=`<i style="background:#c0392b">📍</i><b>${he(nm)}</b>`;fm=new maplibregl.Marker({element:e,anchor:'bottom'}).setLngLat(v).addTo(map);
+ map.flyTo({center:v,zoom:17.2,pitch:62,bearing:-20,duration:2200});
+ const q2=encodeURIComponent(q);let dn=!!+done;
+ const draw=()=>{$('shc').innerHTML=`<h2>📍 ${he(nm)}</h2><p>${he(q)}</p><a target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${q2}&travelmode=walking">🚶 Ir a pé</a><a class="o" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${q2}">🗺 Google Maps</a>${pid?`<button class="b" id="fvb">${dn?'✔ Já visitei':'☐ Marcar como visitado'}</button>`:''}`;const b=$('fvb');if(b)b.onclick=()=>{dn=!dn;try{parent.postMessage({visited:pid,on:dn},'*')}catch(x){}draw()};$('sh').classList.add('o')};draw()};
+const go=()=>{const p=new URLSearchParams(location.hash.slice(1));if(p.has('find')){find(p.get('find'),p.get('pid'),p.get('d'));return}const k=p.has('ilus')?'ilus':p.has('fly')?'fly':'';if(!k)return;const id=p.get(k);if(k=='ilus')openIlus(id);else{el.classList.remove('o');const a=byId[id]||byId.col;try{map.flyTo({center:[a.lon,a.lat],zoom:id=='str'?15.2:15.8,pitch:62,bearing:-20,duration:2200})}catch(e){}}};
+addEventListener('hashchange',go);addEventListener('message',e=>{if(e.data&&e.data.go){const same=location.hash===e.data.go;try{location.hash=e.data.go}catch(x){}if(same)go()}});setTimeout(go,900)}
+})();
+</script><div style="position:fixed;left:6px;bottom:2px;z-index:99;font:10px system-ui;color:#fff9;pointer-events:none;text-shadow:0 1px 2px #000">v17</div><script>if(/embed/.test(location.search))document.body.classList.add("emb")</script></body></html>
